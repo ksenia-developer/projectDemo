@@ -1,0 +1,54 @@
+{% extends 'booking/base.html' %}
+{% load static %}
+{% block title %}Главная · Конференции.РФ{% endblock %}
+{% block content %}
+<section class="hero card">
+  <div>
+    <p class="eyebrow">Бронирование помещений для всероссийских конференций</p>
+    <h1>Выберите аудиторию, коворкинг или кинозал для мероприятия</h1>
+    <p>Зарегистрируйтесь, оформите заявку и отслеживайте ее статус в личном кабинете.</p>
+    <div class="actions">
+      <a class="btn" href="{% url 'application_create' %}">Создать заявку</a>
+      <a class="btn ghost" href="{% url 'register' %}">Регистрация</a>
+    </div>
+  </div>
+  <div class="slider" data-slider aria-label="Слайд-шоу помещений">
+    <div class="slide active"><img src="{% static 'booking/img/talk_zone.png' %}" alt="Аудитория"><span>Аудитория</span></div>
+    <div class="slide"><img src="{% static 'booking/img/kovorking.png' %}" alt="Коворкинг"><span>Коворкинг</span></div>
+    <div class="slide"><img src="{% static 'booking/img/comort.png' %}" alt="Кинозал"><span>Кинозал</span></div>
+    <div class="slide"><img src="{% static 'booking/img/conference.png' %}" alt="Конференц-зал"><span>Конференц-зал</span></div>
+    <button class="slider-btn prev" type="button" data-prev>‹</button>
+    <button class="slider-btn next" type="button" data-next>›</button>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>Доступные помещения</h2><a href="{% url 'rooms' %}">Смотреть все</a></div>
+  <div class="grid">
+    {% for room in rooms %}
+      <article class="card room-card">
+        <h3>{{ room.name }}</h3>
+        <p class="badge">{{ room.get_room_type_display }}</p>
+        <p>Вместимость: {{ room.capacity }} человек</p>
+        <p>{{ room.description }}</p>
+      </article>
+    {% empty %}
+      <p>Помещения появятся после заполнения базы данных.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <h2>Отзывы пользователей</h2>
+  <div class="grid">
+    {% for review in reviews %}
+      <article class="card">
+        <strong>{{ review.rating }}/5 · {{ review.application.room.name }}</strong>
+        <p>{{ review.text }}</p>
+      </article>
+    {% empty %}
+      <p>Пока отзывов нет.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

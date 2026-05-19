@@ -1,0 +1,37 @@
+{% extends 'booking/base.html' %}
+{% block title %}Помещения · Конференции.РФ{% endblock %}
+{% block content %}
+<section class="card rooms-head">
+  <div>
+    <p class="eyebrow">Каталог помещений</p>
+    <h1>Аудитории, коворкинги и кинозалы</h1>
+    <p>Выберите подходящее помещение, затем оформите заявку на бронирование.</p>
+  </div>
+  <a class="btn" href="{% url 'application_create' %}">Оформить заявку</a>
+</section>
+
+<section class="card">
+  <form class="filters" method="get">
+    <select name="type">
+      <option value="">Все типы</option>
+      {% for value, label in room_types %}<option value="{{ value }}" {% if current_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <button class="btn small" type="submit">Показать</button>
+  </form>
+</section>
+
+<section class="grid rooms-grid">
+  {% for room in rooms %}
+    <article class="card room-card detailed-room">
+      <div class="room-visual {{ room.room_type }}"></div>
+      <h3>{{ room.name }}</h3>
+      <p class="badge">{{ room.get_room_type_display }}</p>
+      <p>Вместимость: {{ room.capacity }} человек</p>
+      <p>{{ room.description }}</p>
+      <a class="btn small" href="{% url 'application_create' %}">Забронировать</a>
+    </article>
+  {% empty %}
+    <p>Помещения не найдены.</p>
+  {% endfor %}
+</section>
+{% endblock %}

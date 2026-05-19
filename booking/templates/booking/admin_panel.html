@@ -1,0 +1,62 @@
+{% extends 'booking/base.html' %}
+{% block title %}Панель администратора · Конференции.РФ{% endblock %}
+{% block content %}
+<section class="card admin-head">
+  <div>
+    <p class="eyebrow">Панель администратора</p>
+    <h1>Управление заявками</h1>
+  </div>
+  {% if new_count %}<button class="notify" type="button" data-alert="Новых заявок: {{ new_count }}">🔔 {{ new_count }}</button>{% endif %}
+</section>
+
+<section class="card">
+  <form class="filters" method="get">
+    <input type="text" name="search" value="{{ search }}" placeholder="Поиск по пользователю или помещению">
+    <select name="status">
+      <option value="">Все статусы</option>
+      {% for value, label in statuses %}<option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <select name="sort">
+      <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>Сначала новые</option>
+      <option value="created_at" {% if sort == 'created_at' %}selected{% endif %}>Сначала старые</option>
+      <option value="conference_date" {% if sort == 'conference_date' %}selected{% endif %}>По дате конференции ↑</option>
+      <option value="-conference_date" {% if sort == '-conference_date' %}selected{% endif %}>По дате конференции ↓</option>
+      <option value="status" {% if sort == 'status' %}selected{% endif %}>По статусу</option>
+      <option value="room__name" {% if sort == 'room__name' %}selected{% endif %}>По помещению</option>
+    </select>
+    <button class="btn small" type="submit">Применить</button>
+  </form>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>№</th><th>Пользователь</th><th>Помещение</th><th>Дата</th><th>Оплата</th><th>Статус</th></tr></thead>
+      <tbody>
+      {% for app in page_obj %}
+        <tr>
+          <td>#{{ app.pk }}</td>
+          <td>{{ app.user.profile.full_name }}<br><small>{{ app.user.username }}</small></td>
+          <td>{{ app.room.name }}</td>
+          <td>{{ app.conference_date|date:'d.m.Y' }}</td>
+          <td>{{ app.get_payment_method_display }}</td>
+          <td>
+            <form method="post" action="{% url 'admin_change_status' app.pk %}" class="inline-form">
+              {% csrf_token %}
+              <select name="status">
+                {% for value, label in statuses %}<option value="{{ value }}" {% if app.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+              </select>
+              <button class="btn tiny" type="submit">OK</button>
+            </form>
+          </td>
+        </tr>
+      {% empty %}<tr><td colspan="6">Заявки не найдены.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&status={{ current_status }}&search={{ search }}&sort={{ sort }}">Назад</a>{% endif %}
+    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&status={{ current_status }}&search={{ search }}&sort={{ sort }}">Вперед</a>{% endif %}
+  </div>
+</section>
+{% endblock %}

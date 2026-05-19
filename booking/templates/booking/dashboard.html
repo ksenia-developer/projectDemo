@@ -1,0 +1,57 @@
+{% extends 'booking/base.html' %}
+{% load static %}
+{% block title %}Личный кабинет · Конференции.РФ{% endblock %}
+{% block content %}
+<section class="card cabinet-head">
+  <div>
+    <p class="eyebrow">Личный кабинет</p>
+    <h1>{{ user.profile.full_name|default:user.username }}</h1>
+    <p>{{ user.email }} · {{ user.profile.phone }}</p>
+  </div>
+  <a class="btn" href="{% url 'application_create' %}">Новая заявка</a>
+</section>
+
+
+<section class="card cabinet-slider">
+  <div class="section-head compact">
+    <div>
+      <p class="eyebrow">Помещения</p>
+      <h2>Выберите площадку для конференции</h2>
+    </div>
+    <a href="{% url 'rooms' %}">Все помещения</a>
+  </div>
+  <div class="slider dashboard-slider" data-slider aria-label="Слайд-шоу помещений">
+    <div class="slide active"><img src="{% static 'booking/img/comort.png' %}" alt="Аудитория"><span>Аудитория</span></div>
+    <div class="slide"><img src="{% static 'booking/img/kovorking.png' %}" alt="Коворкинг"><span>Коворкинг</span></div>
+    <div class="slide"><img src="{% static 'booking/img/talk_zone.png' %}" alt="Кинозал"><span>Кинозал</span></div>
+    <div class="slide"><img src="{% static 'booking/img/conference.png' %}" alt="Конференц-зал"><span>Конференц-зал</span></div>
+    <button class="slider-btn prev" type="button" data-prev>‹</button>
+    <button class="slider-btn next" type="button" data-next>›</button>
+  </div>
+</section>
+
+<section class="card">
+  <h2>История заявок</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>№</th><th>Помещение</th><th>Дата</th><th>Оплата</th><th>Статус</th><th>Отзыв</th></tr></thead>
+      <tbody>
+      {% for app in applications %}
+        <tr>
+          <td>#{{ app.pk }}</td>
+          <td>{{ app.room.name }}</td>
+          <td>{{ app.conference_date|date:'d.m.Y' }}</td>
+          <td>{{ app.get_payment_method_display }}</td>
+          <td><span class="status {{ app.status }}">{{ app.get_status_display }}</span></td>
+          <td>
+            {% if app.review %}{{ app.review.rating }}/5{% elif app.can_review %}<a href="{% url 'review_create' app.pk %}">Оставить отзыв</a>{% else %}После смены статуса{% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">У вас пока нет заявок.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
